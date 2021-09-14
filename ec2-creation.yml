@@ -1,0 +1,98 @@
+---
+- hosts: server
+  gather_facts: False
+  vars: 
+    aws_ec2_instance_name: Bamboo-Agent
+    aws_ec2_image: ami-0567f647e75c7bc05
+    aws_ec2_instance_type: t2.micro
+    aws_vpc_id: vpc-0da25a6b
+    aws_region: ap-southeast-2
+    aws_subnet_id: subnet-81f151e7
+    aws_keypair_name: YongKeypair
+    aws_keypair_keyfile: /Users/yong.zeng/Documents/Yong/aws/YongKeypair.pem
+    
+  tasks:
+    - name: Setting up the Security Group for new instance
+      ec2_group:
+          name: Bamboo_Security_Group
+          description: Allowing Traffic on port 22 and 80
+          region: "{{ aws_region }}"
+          rules:
+           - proto: tcp
+             from_port: 80
+             to_port: 80
+             cidr_ip: 0.0.0.0/0
+
+           - proto: tcp
+             from_port: 22
+             to_port: 22
+             cidr_ip: 0.0.0.0/0
+
+           - proto: icmp
+             from_port: -1
+             to_port: -1
+             cidr_ip: 0.0.0.0/0
+          rules_egress:
+           - proto: all
+             cidr_ip: 0.0.0.0/0
+          vpc_id:  "{{ aws_vpc_id }}"
+
+    - name: Provision EC2 instance
+      ec2:
+         key_name: "{{ aws_keypair_name }}"
+         region: "{{ aws_region }}"
+         instance_type: "{{ aws_ec2_instance_type }}"
+         image: "{{ aws_ec2_image }}"
+         wait: yes
+         wait_timeout: 500
+         count: 1
+         instance_tags:
+            Name: "{{ aws_ec2_instance_name }}"
+         volumes:
+            - device_name: /dev/xvda
+              volume_type: gp2
+              volume_size: 8
+         monitoring: yes
+         vpc_subnet_id: "{{ aws_subnet_id }}"
+         assign_public_ip: yes
+         group: Bamboo_Security_Group
+      register: ec2
+    
+    - name: Wait for SSH to come up
+      wait_for:
+          host: "{{ item.public_dns_name }}"
+          port: 22
+          delay: 60
+          timeout: 320
+          state: started
+      with_items: "{{ ec2.instances }}"
+
+    - name: Add all instance public IPs to host group
+      add_host: 
+        hostname: "{{ item.public_ip }}" 
+        groups: ec2hosts
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: "{{aws_keypair_keyfile}}"
+        ansible_python_interpreter: /usr/bin/python3
+      loop: "{{ ec2.instances }}"   
+
+- hosts: ec2hosts
+  name: configuration play
+  become: yes
+  gather_facts: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required software 
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - openjdk-8-jdk
+      environment:
+        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
