@@ -4,6 +4,8 @@
   vars: 
     aws_profile_name: SCATS
     aws_ec2_instance_name: Bamboo-Agent-Test
+    aws_ec2_instance_count: 1
+    aws_security_group_name: Bamboo_Agent_Security_Group
     aws_ec2_image: ami-0567f647e75c7bc05 
     aws_ec2_instance_type: t2.micro
     aws_vpc_id: vpc-0fe19049e32fbc259
@@ -15,12 +17,12 @@
   tasks:
     - name: Setting up the Security Group for new instance
       ec2_group:
-          name: Bamboo_Agent_Security_Group
-          description: Allowing Traffic on port 22 and 80
+          name: "{{ aws_security_group_name }}"
+          description: Allowing Traffic on port 22
           profile: "{{ aws_profile_name }}"
           region: "{{ aws_region }}"
           tags:
-            Name: Bamboo_Agent_Security_Group
+            Name: "{{ aws_security_group_name }}"
           rules:
            - proto: tcp
              from_port: 22
@@ -45,7 +47,7 @@
          image: "{{ aws_ec2_image }}"
          wait: yes
          wait_timeout: 500
-         count: 1
+         count: "{{ aws_ec2_instance_count }}"
          instance_tags:
             Name: "{{ aws_ec2_instance_name }}"
          volumes:
@@ -55,7 +57,7 @@
          monitoring: yes
          vpc_subnet_id: "{{ aws_subnet_id }}"
          assign_public_ip: yes
-         group: Bamboo_Security_Group
+         group: "{{ aws_security_group_name }}"
       register: ec2
     
     - name: Wait for SSH to come up
