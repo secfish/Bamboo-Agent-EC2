@@ -2,15 +2,15 @@
 - hosts: server
   gather_facts: False
   vars: 
-    aws_profile_name: SCATS
+    aws_profile_name: default
     aws_ec2_instance_name: Bamboo-Agent-Test
     aws_ec2_image: ami-0567f647e75c7bc05 
     aws_ec2_instance_type: t2.micro
-    aws_vpc_id: vpc-0fe19049e32fbc259
+    aws_vpc_id: vpc-0da25a6b
     aws_region: ap-southeast-2
-    aws_subnet_id: subnet-0c193ce6122d76a14
-    aws_keypair_name: YongTestDevops
-    aws_keypair_keyfile: /Users/yong.zeng/Project/SCATS-TfNSW/aws/YongTestDevops.pem
+    aws_subnet_id: subnet-81f151e7
+    aws_keypair_name: YongKeypair
+    aws_keypair_keyfile: /Users/yong.zeng/Documents/Yong/aws/YongKeypair.pem
     
   tasks:
     - name: Setting up the Security Group for new instance
