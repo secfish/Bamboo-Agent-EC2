@@ -2,7 +2,7 @@
 - hosts: localserver
   gather_facts: false
   vars: 
-    aws_profile_name: SCATS
+    aws_profile_name: default
     aws_ec2_instance_name: Bamboo-Agent-Test
     aws_region: ap-southeast-2
   roles:

@@ -1,0 +1,17 @@
+---
+- name: Collect EC2 instance info
+  community.aws.ec2_instance_info:
+    region: "{{ aws_region }}"
+    profile: "{{ aws_profile_name }}"
+    filters:
+        "tag:Name": "{{ aws_ec2_instance_name }}" 
+  register: ec2_node_info
+
+- name: Terminate EC2 instance
+  ec2:
+      instance_ids: "{{ item.instance_id }}"
+      region: "{{ aws_region }}"
+      profile: "{{ aws_profile_name }}"
+      state: absent 
+      wait: yes
+  with_items: "{{ec2_node_info.instances}}"   

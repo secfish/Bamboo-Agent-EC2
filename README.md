@@ -10,12 +10,20 @@ aws config
 aws ec2 create-key-pair --key-name <YourKeyPairName>
 
 // install ansible 
+pip3 install ansible 
+pip3 install boto 
 
-// verify "ansible_python_interpreter" value in host file based on your local python environment 
+// change "ansible_python_interpreter" value in file:hosts based on your local python environment 
 
+// if your subnet is private, change following items value in file: ./bamboo-agent-create/tasks/main.yml
+//   - ec2_group/rules/cidr_ip: <yourPrivateIpRange>
+//   - wait_for/host: "{{ item.private_ip }}" 
+//   - add_host/host: "{{ item.public_ip }}" 
 ```
 
 #### 2. Create  Bamboo Agent EC2 instance
+
+
 
 ```sh
 // change vars in ec2-creation.yml based on your environment 
