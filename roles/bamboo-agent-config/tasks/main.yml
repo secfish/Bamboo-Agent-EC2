@@ -13,3 +13,13 @@
       - openjdk-8-jdk
   environment:
     JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+
+- name: Download Bamboo remote agent package
+  get_url:
+    url: http://10.151.42.162:8085/agentServer/agentInstaller/atlassian-bamboo-agent-installer-7.2.1.jar
+    dest: /home/ubuntu
+
+- name: Run Bamboo remote agent
+  ansible.builtin.shell:
+    cmd: java -jar atlassian-bamboo-agent-installer-7.2.1.jar http://10.151.42.162:8085/agentServer/ > /dev/null 2>1 & 
+    chdir: /home/ubuntu/
