@@ -5,13 +5,14 @@
     profile: "{{ aws_profile_name }}"
     filters:
         "tag:Name": "{{ aws_ec2_instance_name }}" 
+        instance-state-name: [ "running" ]
   register: ec2_node_info
 
 - name: Terminate EC2 instance
-  ec2:
+  amazon.aws.ec2:
       instance_ids: "{{ item.instance_id }}"
       region: "{{ aws_region }}"
       profile: "{{ aws_profile_name }}"
       state: absent 
       wait: yes
-  with_items: "{{ec2_node_info.instances}}"   
+  with_items: "{{ec2_node_info.instances}}"  

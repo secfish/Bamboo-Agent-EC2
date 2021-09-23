@@ -14,12 +14,62 @@
   environment:
     JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
 
-- name: Download Bamboo remote agent package
-  get_url:
-    url: http://10.151.42.162:8085/agentServer/agentInstaller/atlassian-bamboo-agent-installer-7.2.1.jar
-    dest: /home/ubuntu
 
-- name: Run Bamboo remote agent
-  ansible.builtin.shell:
-    cmd: java -jar atlassian-bamboo-agent-installer-7.2.1.jar http://10.151.42.162:8085/agentServer/ > /dev/null 2>1 & 
-    chdir: /home/ubuntu/
+- name: Add service user
+  user:
+    name: "{{ bamboo_agent_user }}"
+    uid: "{{ bamboo_agent_uid }}"
+    home: "{{ bamboo_agent_application_folder }}"
+
+- name: Create data folder for agent
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ bamboo_agent_user }}"
+    group: "{{ bamboo_agent_user }}"
+  with_items:
+    - "{{ bamboo_agent_data_folder }}"
+    - "{{ bamboo_agent_data_folder }}/conf"
+    - "{{ bamboo_agent_data_folder }}/bin"
+  register: data_folder
+
+- name: Download Bamboo  agent package
+  get_url:
+    url: "{{ bamboo_master_url }}/agentServer/agentInstaller/atlassian-bamboo-agent-installer-{{ bamboo_master_version }}.jar"
+    dest: "{{ bamboo_agent_application_folder }}"
+
+
+- name: Install Bamboo agent
+  command: "java -Dbamboo.home={{ bamboo_agent_data_folder }} -jar {{ bamboo_agent_application_folder }}/atlassian-bamboo-agent-installer-{{ bamboo_master_version }}.jar {{ bamboo_master_url }}/agentServer/ install"
+  become: yes
+  #become_user: "{{ bamboo_agent_user }}"
+
+- name: Remove bamboo agent installer
+  shell: "rm -rf {{ bamboo_agent_application_folder }}/atlassian-bamboo-agent-installer-*.jar"
+
+- name: Install bambooagent  service 
+  template:
+    src: bambooagent.service.j2
+    dest: /etc/systemd/system/bambooagent.service
+    mode: 0744
+
+- name: Ensure service is enabled and started
+  systemd:
+    name: bambooagent
+    enabled: yes
+    daemon_reload: yes
+    state: started
+
+#- name: Configure to not automatically add JDK capabilities
+#  lineinfile:
+#    path: "{{ bamboo_agent_data_folder }}/conf/wrapper.conf"
+#    line: wrapper.java.additional.3=-DDISABLE_AGENT_AUTO_CAPABILITY_DETECTION=true
+#  ignore_errors: yes
+#  notify: restart bambooagent
+
+#- name: Add capabilities
+#  template:
+#    src: bamboo-capabilities.properties.j2
+#    dest: "{{ bamboo_agent_data_folder }}/bin/bamboo-capabilities.properties"
+
+  

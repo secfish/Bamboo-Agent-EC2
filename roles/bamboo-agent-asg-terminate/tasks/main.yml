@@ -1,0 +1,23 @@
+---
+- name: Collecting ec2 asg information 
+  community.aws.ec2_asg_info:
+    tags:
+      Name: "{{ aws_ec2_asg_name}}"
+  register: ec2_asg_info
+
+- name: Terminate ec2 asg instance
+  community.aws.ec2_asg:
+      name: "{{ ec2_asg_info.results[0].auto_scaling_group_name}}"
+      region: "{{ aws_region }}"
+      profile: "{{ aws_profile_name }}"
+      state: absent 
+      wait_for_instances: yes
+  when: ec2_asg_info.results|length > 0  
+
+- name: Terminate ec2 launch config
+  community.aws.ec2_lc:
+    name: "{{ ec2_asg_info.results[0].launch_config_name }}"
+    region: "{{ aws_region }}"
+    profile: "{{ aws_profile_name }}"
+    state: absent 
+  when: ec2_asg_info.results|length > 0 

@@ -1,0 +1,39 @@
+---
+- name: Collecting ec2 ami information
+  amazon.aws.ec2_ami_info:
+      profile: "{{ aws_profile_name }}"
+      region: "{{ aws_region }}"
+      filters:
+        "tag:Name": "{{ aws_ec2_ami_name }}"
+  register: ec2_ami_info
+
+- name: Terminate ec2 ami instance
+  ec2_ami:
+      image_id: "{{ item.image_id }}"
+      delete_snapshot: True
+      region: "{{ aws_region }}"
+      profile: "{{ aws_profile_name }}"
+      state: absent 
+      wait: yes
+  with_items: "{{ ec2_ami_info.images }}"   
+
+- name: Collect EC2 ami template instance info
+  community.aws.ec2_instance_info:
+    region: "{{ aws_region }}"
+    profile: "{{ aws_profile_name }}"
+    filters:
+        "tag:Name": "{{ aws_ec2_instance_name }}" 
+        "tag:AmiName": "{{ aws_ec2_ami_name }}" 
+  register: ec2_node_info
+
+- name: Terminate EC2 instance
+  amazon.aws.ec2:
+      instance_ids: "{{ item.instance_id }}"
+      region: "{{ aws_region }}"
+      profile: "{{ aws_profile_name }}"
+      state: absent 
+      wait: yes
+  with_items: "{{ec2_node_info.instances}}"  
+
+
+

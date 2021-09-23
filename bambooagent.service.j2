@@ -1,0 +1,16 @@
+[Unit]
+Description=Atlassian Bamboo remote agent
+After=syslog.target network.target
+
+[Service]
+Environment=PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin{% if bamboo_agent_capabilities is defined %}{% for item in bamboo_agent_capabilities %}{% if item.binary_path is defined %}:{{ item.binary_path }}{% endif %}{% endfor %}{% endif %}
+Environment=JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+Type=forking
+User={{ bamboo_agent_user }}
+Group={{ bamboo_agent_user }}
+PIDFile={{ bamboo_agent_data_folder }}/bin/bamboo-agent.pid
+ExecStart={{ bamboo_agent_data_folder }}/bin/bamboo-agent.sh start
+ExecStop={{ bamboo_agent_data_folder }}/bin/bamboo-agent.sh stop
+
+[Install]
+WantedBy=multi-user.target
