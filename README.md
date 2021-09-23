@@ -21,22 +21,28 @@ pip3 install boto
 //   - add_host/host: "{{ item.public_ip }}" 
 ```
 
-#### 2. Create  Bamboo Agent EC2 instance
+#### 2. Create/Terminate  Bamboo Agent EC2  instance
 
-
+if you only want to create/terminate one Bamboo Agent EC2 instance, do: 
 
 ```sh
-// change vars in ec2-creation.yml based on your environment 
-
+// change vars in var.yml based on your environment 
 // create bamboo agent  
 ansible-playbook -i hosts ec2-creation.yml
-```
-
-#### 3. Terminate Bamboo Agent EC2 instance
-
-```
-// verify vars in ec2-terminate.yml 
 
 // terminate bamboo agent ec2 instance 
 ansible-playbook -i hosts ec2-terminate.yml
+```
+
+#### 3. Create/Terminate Bamboo Agent EC2 by Autoscaling group 
+
+if you want to create/terminate many Bamboo Agent EC2 instance by autoscaling group, do:
+
+```
+// change vars in var.yml based on your environment
+// create bamboo agent ec2 autoscaling group 
+ansible-playbook -i hosts ec2-asg-creation.yml 
+
+// terminate bamboo agent ec2 autoscaling group
+ansible-playbook -i hosts ec2-asg-terminate.yml
 ```
