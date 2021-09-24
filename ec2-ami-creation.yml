@@ -5,10 +5,9 @@
   vars_files: 
     - var.yml 
   roles:
-    - bamboo-agent-asg-terminate 
     - bamboo-agent-ami-terminate
     - bamboo-agent-ami-precreate
-  
+
 - hosts: bamboo-agent-ami-hosts
   name:  Configuration Bamboo Agent AMI template instance 
   gather_facts: true
@@ -17,6 +16,7 @@
     - var.yml 
   roles:
     - bamboo-agent-config
+
 
 - hosts: localserver
   vars_files: 
@@ -41,38 +41,12 @@
         profile: "{{ aws_profile_name }}"
         instance_id: "{{ ec2_ami_temp_info.instances[0].instance_id }}"  
         wait: yes
-        name: "{{aws_ec2_ami_name}}-{{ tstamp.stdout }}" 
+        name: "{{aws_ec2_ami_tag_name}}-{{ tstamp.stdout }}" 
         tags:
           Name: "{{aws_ec2_ami_tag_name}}"
       register: ec2_ami_info
       when: ec2_ami_temp_info.instances|length > 0  
     
-    - name: create ec2 launch config
-      community.aws.ec2_lc:
-        name: "Bamboo-Agent-ec2-lc-{{ tstamp.stdout }}"
-        image_id: "{{ ec2_ami_info.image_id }}"
-        key_name: "{{ aws_keypair_name }}"
-        region: "{{ aws_region }}"
-        security_groups: "{{ aws_security_group_name }}"
-        instance_type: "{{ aws_ec2_instance_type }}"
-        assign_public_ip: "{{ aws_ec2_assign_public_ip }}"
-      register: ec2_lc_info
-
-    - name: create ec2 autoscaling group 
-      community.aws.ec2_asg:
-        name: "{{ aws_ec2_asg_tag_name }}-{{ tstamp.stdout }}"
-        launch_config_name: "{{ ec2_lc_info.name}}"
-        health_check_period: 60
-        health_check_type: EC2
-        replace_all_instances: yes
-        min_size: "{{ aws_ec2_asg_min_size }}"
-        max_size: "{{ aws_ec2_asg_max_size }}"
-        desired_capacity: "{{ aws_ec2_asg_desired_capacity }}"
-        wait_for_instances: false
-        region: "{{ aws_region }}"
-        tags:
-          - Name: "{{aws_ec2_asg_tag_name}}"
-
     - name: Terminate Bamboo Agent Template instance
       amazon.aws.ec2:
           instance_ids: "{{ item.instance_id }}"

@@ -5,4 +5,3 @@
     - var.yml 
   roles:
     - bamboo-agent-asg-terminate 
-    - bamboo-agent-ami-terminate

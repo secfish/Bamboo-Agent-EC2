@@ -1,0 +1,9 @@
+---
+- hosts: localserver
+  name: creation Bamboo Agent 
+  # termiate emc ami with name: {{ aws_ec2_ami_name }}
+  gather_facts: False
+  vars_files: 
+    - var.yml 
+  roles:
+    - bamboo-agent-ami-terminate

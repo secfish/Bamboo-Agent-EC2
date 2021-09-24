@@ -2,7 +2,7 @@
 - name: Collecting ec2 asg information 
   community.aws.ec2_asg_info:
     tags:
-      Name: "{{ aws_ec2_asg_name}}"
+      Name: "{{ aws_ec2_asg_tag_name}}"
   register: ec2_asg_info
 
 - name: Terminate ec2 asg instance

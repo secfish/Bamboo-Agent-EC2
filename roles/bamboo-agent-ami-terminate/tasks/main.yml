@@ -1,10 +1,11 @@
 ---
+# termiate emc ami with name: {{ aws_ec2_ami_name }}
 - name: Collecting ec2 ami information
   amazon.aws.ec2_ami_info:
       profile: "{{ aws_profile_name }}"
       region: "{{ aws_region }}"
       filters:
-        "tag:Name": "{{ aws_ec2_ami_name }}"
+        name: "{{ aws_ec2_ami_name }}"
   register: ec2_ami_info
 
 - name: Terminate ec2 ami instance
@@ -23,7 +24,7 @@
     profile: "{{ aws_profile_name }}"
     filters:
         "tag:Name": "{{ aws_ec2_instance_name }}" 
-        "tag:AmiName": "{{ aws_ec2_ami_name }}" 
+        "tag:AmiName": "{{ aws_ec2_ami_tag_name }}" 
   register: ec2_node_info
 
 - name: Terminate EC2 instance

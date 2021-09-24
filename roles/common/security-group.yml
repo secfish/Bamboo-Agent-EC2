@@ -1,0 +1,30 @@
+---
+- name: Setting up the Security Group for new instance
+  ec2_group:
+      name: "{{ aws_security_group_name }}"
+      description: Allowing Traffic on port 22
+      profile: "{{ aws_profile_name }}"
+      region: "{{ aws_region }}"
+      tags:
+        Name: "{{ aws_security_group_name }}"
+      rules:
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: "{{ aws_ec2_subnet_cidr_ip }}"
+
+        - proto: icmp
+          from_port: -1
+          to_port: -1
+          cidr_ip: "{{ aws_ec2_subnet_cidr_ip }}"
+
+      rules_egress:
+        - proto: all
+          cidr_ip: 0.0.0.0/0
+      vpc_id:  "{{ aws_vpc_id }}"
+
+
+
+
+
+

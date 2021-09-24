@@ -8,6 +8,7 @@
         instance-state-name: [ "running" ]
   register: ec2_node_info
 
+
 - name: Terminate EC2 instance
   amazon.aws.ec2:
       instance_ids: "{{ item.instance_id }}"

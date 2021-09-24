@@ -1,36 +1,17 @@
 ---
 - hosts: localserver
   name: creation Bamboo Agent 
-  gather_facts: True
-  vars:
-    aws_security_group_name: Bamboo_Agent_Security_Group
-    aws_ec2_instance_name: Bamboo-Agent-Test
-    aws_region: ap-southeast-2
-    aws_ec2_ami_name: Bamboo-Agent-Ami
-    aws_profile_name: default
-    aws_ec2_image: ami-0567f647e75c7bc05 
-    aws_ec2_instance_type: t2.micro
-    aws_vpc_id: vpc-0da25a6b
-    aws_subnet_id: subnet-81f151e7
-    aws_keypair_name: YongKeypair
-    aws_keypair_keyfile: /Users/yong.zeng/Documents/Yong/aws/YongKeypair.pem
-    #aws_profile_name: SCATS
-    #aws_ec2_image: ami-0567f647e75c7bc05 
-    #aws_ec2_instance_type: t2.micro
-    #aws_vpc_id: vpc-0fe19049e32fbc259
-    #aws_subnet_id: subnet-0c193ce6122d76a14
-    #aws_keypair_name: YongTestDevops
-    #aws_keypair_keyfile: /Users/yong.zeng/Project/SCATS-TfNSW/aws/YongTestDevops.pem  
-
-
+  gather_facts: False
+  vars_files: 
+    - var.yml 
   tasks:
-    - name: Collecting Bamboo Agent AMI template instance information
-      community.aws.ec2_instance_info:
-        profile: "{{ aws_profile_name }}"
-        region: "{{ aws_region }}"
-        filters:
-          "tag:Name": Bamboo-Agent-Test
-      register: ec2_temp_info
+    - name: Collecting ec2 ami information
+      amazon.aws.ec2_ami_info:
+          profile: "{{ aws_profile_name }}"
+          region: "{{ aws_region }}"
+          filters:
+            "tag:Name": "{{ aws_ec2_ami_tag_name }}"
+      register: ec2_ami_info
 
 
 

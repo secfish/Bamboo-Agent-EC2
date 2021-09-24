@@ -5,10 +5,11 @@
   vars_files: 
     - var.yml 
   roles:
+    - bamboo-agent-terminate
     - bamboo-agent-create
   
   
-- hosts: bamboo-agent-hosts
+- hosts: bamboo-agent-ami-hosts
   name: configuration Bamboo Agent 
   become: yes
   gather_facts: true
