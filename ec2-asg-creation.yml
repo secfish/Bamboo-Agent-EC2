@@ -6,7 +6,6 @@
     - var.yml 
   roles:
     - bamboo-agent-asg-terminate 
-    - bamboo-agent-ami-terminate
     - bamboo-agent-ami-precreate
   
 - hosts: bamboo-agent-ami-hosts
@@ -41,7 +40,7 @@
         profile: "{{ aws_profile_name }}"
         instance_id: "{{ ec2_ami_temp_info.instances[0].instance_id }}"  
         wait: yes
-        name: "{{aws_ec2_ami_name}}-{{ tstamp.stdout }}" 
+        name: "{{aws_ec2_ami_tag_name}}-{{ tstamp.stdout }}" 
         tags:
           Name: "{{aws_ec2_ami_tag_name}}"
       register: ec2_ami_info
@@ -61,6 +60,7 @@
     - name: create ec2 autoscaling group 
       community.aws.ec2_asg:
         name: "{{ aws_ec2_asg_tag_name }}-{{ tstamp.stdout }}"
+        vpc_zone_identifier: ["{{ aws_subnet_id }}"]
         launch_config_name: "{{ ec2_lc_info.name}}"
         health_check_period: 60
         health_check_type: EC2

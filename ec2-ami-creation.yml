@@ -5,7 +5,7 @@
   vars_files: 
     - var.yml 
   roles:
-    - bamboo-agent-ami-terminate
+    #- bamboo-agent-ami-terminate
     - bamboo-agent-ami-precreate
 
 - hosts: bamboo-agent-ami-hosts

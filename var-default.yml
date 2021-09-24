@@ -22,7 +22,6 @@ bamboo_agent_uid: 5000
 bamboo_agent_application_folder: "/opt/{{ bamboo_agent_user }}"
 bamboo_agent_data_folder: "/opt/{{ bamboo_agent_user }}/bamboo-agent-home"
 
-
 aws_ec2_asg_tag_name: Bamboo-Agent-Asg
 aws_ec2_asg_min_size: 1
 aws_ec2_asg_max_size: 2

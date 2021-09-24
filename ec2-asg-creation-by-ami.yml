@@ -36,7 +36,6 @@
       community.aws.ec2_asg:
         name: "{{ aws_ec2_asg_tag_name }}-{{ tstamp.stdout }}"
         vpc_zone_identifier: ["{{ aws_subnet_id }}"]
-        #availability_zones: 
         launch_config_name: "{{ ec2_lc_info.name}}"
         health_check_period: 60
         health_check_type: EC2
