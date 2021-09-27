@@ -23,29 +23,47 @@ pip3 install boto
 
 ## 2. Create/Terminate  Bamboo Agent EC2 single instance
 
-if you only want to create/terminate  Bamboo Agent EC2 one instance without autoscaling, do: 
+if you  want to create   Bamboo Agent EC2 single  instance , do: 
 
 ```sh
-// create bamboo agent with default parameters in var.yml 
+// create bamboo agent with default name "Bamboo-Agent-Test" 
 ansible-playbook -i hosts ec2-creation.yml
 
-// terminate bamboo agent ec2 instance 
+// terminate bamboo agent ec2 instance with default name "Bamboo-Agent-Test" 
 ansible-playbook -i hosts ec2-terminate.yml
 ```
 
 ## 3. Create/Terminate Bamboo Agent EC2 Autoscaling group 
 
-There are two options for you to create  Bamboo Agent EC2 autoscaling group
+### 3.1 Create
 
-### 3.1 Option 1
-
-This option automatically generate new ami and autoscaling group, it takes longer time because it does not use existed ami.
+There are two options for you to create  Bamboo Agent EC2 autoscaling group. 
 
 ```
-// create new Bamboo Agent AMI and new Bamboo Agent ec2 autoscaling group 
-// following command first delete all existed Bamboo Agent autoscaling group with tag: Bamboo-Agent-Asg
+// verify all parameters in var.yml file based on your environment
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Option 1: execute playbook: ec2-asg-creation.yml
+// automatically create new ami/autoscaling group, it takes longer time because it does not use existed ami
+// first create ami and create autoscaling group 
 ansible-playbook -i hosts ec2-asg-creation.yml 
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Option2: execute playbook: ec2-asg-creation-by-ami.yml
+// generate autoscaling group based on existed ami object, it takes shorter time but need 3 steps
+// 1. create new bamboo agent ami if bamboo agent ami is existed 
+      ansible-playbook -i hosts ec2-ami-creation.yml
+      
+// 2. modify "aws_ec2_ami_name" in file: var.yml based on step 1 or your existed ami name
+      aws_ec2_ami_name: <yourExistedBambooAgentAmiName> 
+      
+// 3. create new bamboo agent autoscaling group by ami 
+      ansible-playbook -i hosts ec2-asg-creation-by-ami.yml
+```
+
+### 3.2 Terminate 
+
+```
 // if you do not want to use bamboo agent autoscaling group and ami anymore, you can do:
 
 // delete all existed Bamboo agent ec2 autoscaling group 
@@ -53,30 +71,5 @@ ansible-playbook -i hosts ec2-asg-terminate.yml
 
 // delete all bamboo agent ami
 ansible-playbook -i hosts ec2-ami-terminate-all.yml 
-```
-
-### 3.2 Option 2
-
-This option generate autoscaling group based on existed ami object, it takes shorter time but need more steps.
-
-```
-// create bamboo agent ec2 autoscaling group based on existed ami 
-// 1. create new bamboo agent ami if bamboo agent ami is existed 
-      ansible-playbook -i hosts ec2-ami-creation.yml
-
-// 2. modify "aws_ec2_ami_name" in file: var.yml based on step 1 or your existed ami name
-      aws_ec2_ami_name: <yourExistedBambooAgentAmiName> 
-
-// 3. create new bamboo agent autoscaling group by ami 
-      ansible-playbook -i hosts ec2-asg-creation-by-ami.yml
-
-// if you do not want to use bamboo agent autoscaling group and ami anymore, you can do:
-
-// delete all existed Bamboo agent ec2 autoscaling group 
-ansible-playbook -i hosts ec2-asg-terminate.yml
-
-// delete all bamboo agent ami 
-ansible-playbook -i hosts ec2-ami-terminate-all.yml 
-
 ```
 
