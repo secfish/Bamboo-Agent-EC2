@@ -1,9 +1,10 @@
 aws_profile_name: SCATS
-#ubuntu
+#ubuntu 20 
 aws_ec2_image: ami-0567f647e75c7bc05 
 aws_ec2_instance_type: t2.micro
 aws_vpc_id: vpc-0fe19049e32fbc259
 aws_subnet_id: subnet-0c193ce6122d76a14
+# keypair for Bamboo agent SSH
 aws_keypair_name: YongTestDevops
 aws_keypair_keyfile: /Users/yong.zeng/Project/SCATS-TfNSW/aws/YongTestDevops.pem  
 aws_ec2_subnet_cidr_ip: 10.0.0.0/8
@@ -13,8 +14,10 @@ aws_security_group_name: Bamboo_Agent_Security_Group
 aws_ec2_instance_name: Bamboo-Agent-Test
 aws_region: ap-southeast-2
 aws_ec2_ami_tag_name: Bamboo-Agent-Ami
+# existed ec2 ami name 
 aws_ec2_ami_name: Bamboo-Agent-Ami-2021-09-24-14-49-32
 
+# bamboo server 
 bamboo_master_url: http://10.151.42.162:8085
 bamboo_master_version: 7.2.1
 bamboo_agent_user: bambooagent
@@ -22,7 +25,11 @@ bamboo_agent_uid: 5000
 bamboo_agent_application_folder: "/opt/{{ bamboo_agent_user }}"
 bamboo_agent_data_folder: "/opt/{{ bamboo_agent_user }}/bamboo-agent-home"
 
+# bamboo agent autoscaling group 
 aws_ec2_asg_tag_name: Bamboo-Agent-Asg
 aws_ec2_asg_min_size: 1
 aws_ec2_asg_max_size: 2
-aws_ec2_asg_desired_capacity: 2
+aws_ec2_asg_desired_capacity: 1
+
+
+
