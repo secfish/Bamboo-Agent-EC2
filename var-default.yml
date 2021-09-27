@@ -15,12 +15,6 @@ aws_region: ap-southeast-2
 aws_ec2_ami_tag_name: Bamboo-Agent-Ami
 aws_ec2_ami_name: Bamboo-Agent-Ami-2021-09-24-12-33-23
 
-bamboo_master_url: http://10.151.42.162:8085
-bamboo_master_version: 7.2.1
-bamboo_agent_user: bambooagent
-bamboo_agent_uid: 5000
-bamboo_agent_application_folder: "/opt/{{ bamboo_agent_user }}"
-bamboo_agent_data_folder: "/opt/{{ bamboo_agent_user }}/bamboo-agent-home"
 
 aws_ec2_asg_tag_name: Bamboo-Agent-Asg
 aws_ec2_asg_min_size: 1

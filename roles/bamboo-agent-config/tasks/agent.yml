@@ -1,0 +1,64 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install required software 
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - openjdk-8-jdk
+  environment:
+    JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+
+
+- name: Add service user
+  user:
+    name: "{{ bamboo_agent_user }}"
+    uid: "{{ bamboo_agent_uid }}"
+    home: "{{ bamboo_agent_application_folder }}"
+
+- name: Create data folder for agent
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ bamboo_agent_user }}"
+    group: "{{ bamboo_agent_user }}"
+  with_items:
+    - "{{ bamboo_agent_data_folder }}"
+    - "{{ bamboo_agent_data_folder }}/conf"
+    - "{{ bamboo_agent_data_folder }}/bin"
+  register: data_folder
+
+- name: Download Bamboo  agent package
+  get_url:
+    url: "{{ bamboo_master_url }}/agentServer/agentInstaller/atlassian-bamboo-agent-installer-{{ bamboo_master_version }}.jar"
+    dest: "{{ bamboo_agent_application_folder }}"
+
+
+- name: Install Bamboo agent
+  command: "java -Dbamboo.home={{ bamboo_agent_data_folder }} -jar {{ bamboo_agent_application_folder }}/atlassian-bamboo-agent-installer-{{ bamboo_master_version }}.jar {{ bamboo_master_url }}/agentServer/ install"
+  become: yes
+  #become_user: "{{ bamboo_agent_user }}"
+
+- name: Remove bamboo agent installer
+  shell: "rm -rf {{ bamboo_agent_application_folder }}/atlassian-bamboo-agent-installer-*.jar"
+
+- name: Install bambooagent  service 
+  template:
+    src: bambooagent.service.j2
+    dest: /etc/systemd/system/bambooagent.service
+    mode: 0744
+
+- name: Ensure service is enabled and started
+  systemd:
+    name: bambooagent
+    enabled: yes
+    daemon_reload: yes
+    state: started
+
+
+  
