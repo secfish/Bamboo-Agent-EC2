@@ -51,7 +51,7 @@ ansible-playbook -i hosts ec2-asg-creation.yml
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Option2: execute playbook: ec2-asg-creation-by-ami.yml
 // generate autoscaling group based on existed ami object, it takes shorter time but need 3 steps
-// 1. create new bamboo agent ami if bamboo agent ami is existed 
+// 1. create new bamboo agent ami if bamboo agent ami is not existed 
       ansible-playbook -i hosts ec2-ami-creation.yml
       
 // 2. modify "aws_ec2_ami_name" in file: var.yml based on step 1 or your existed ami name
